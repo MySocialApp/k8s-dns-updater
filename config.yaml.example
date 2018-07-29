@@ -1,0 +1,19 @@
+GlobalConfig:
+  # Use node name (node) or dns name (dns) IP to update DNS
+  UpdateDnsType: node
+  # Maximum entries in the Round Robin DNS
+  MaxDnsEntries: 10
+
+# DNS info
+DnsInfos:
+  Name: ""
+  Type: A
+  Ttl: 120
+  Proxied: false
+
+# Credentials
+CloudFlareApiInfos:
+  Zoneid: ""
+  Zonename: ""
+  Email: ""
+  Key: ""
