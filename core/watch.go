@@ -1,15 +1,15 @@
 package core
 
 import (
-	"k8s.io/client-go/kubernetes"
-	"strconv"
 	log "github.com/sirupsen/logrus"
+	"github.com/spf13/viper"
 	"k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/fields"
+	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/cache"
-	"time"
-	"github.com/spf13/viper"
 	"net"
+	"strconv"
+	"time"
 )
 
 func WatchNodes(clientSet *kubernetes.Clientset, configFile *viper.Viper) {
@@ -21,38 +21,42 @@ func WatchNodes(clientSet *kubernetes.Clientset, configFile *viper.Viper) {
 		watchlist,
 		&v1.Node{},
 		time.Second,
-		cache.Indexers{},)
+		cache.Indexers{})
 
 	informer.AddEventHandler(cache.ResourceEventHandlerFuncs{
 		// Show node status at start
 		AddFunc: func(obj interface{}) {
-			log.Info("First check: " +  obj.(*v1.Node).ObjectMeta.Name + " unschedulable status node is " + strconv.FormatBool(obj.(*v1.Node).Spec.Unschedulable))
+			if node, ok := obj.(*v1.Node); ok {
+				log.Infof("First check: %s unschedulable status node is %s", node.ObjectMeta.Name, strconv.FormatBool(node.Spec.Unschedulable))
+			}
 		},
 
 		// Show deleted node
 		DeleteFunc: func(obj interface{}) {
-			log.Info("Deleted node: " + obj.(*v1.Node).ObjectMeta.Name)
+			log.Infof("Deleted node: %s", obj.(*v1.Node).ObjectMeta.Name)
 		},
 
 		// Detect changes
-		UpdateFunc: func(oldObj, currentObj interface{}) {
-			currentNodeStatus := strconv.FormatBool(currentObj.(*v1.Node).Spec.Unschedulable)
-			oldNodeStatus := strconv.FormatBool(oldObj.(*v1.Node).Spec.Unschedulable)
+		UpdateFunc: func(oldObj interface{}, currentObj interface{}) {
+			if node, ok := currentObj.(*v1.Node); ok {
+				currentNodeStatus := strconv.FormatBool(node.Spec.Unschedulable)
+				oldNodeStatus := strconv.FormatBool(oldObj.(*v1.Node).Spec.Unschedulable)
 
-			if currentNodeStatus != oldNodeStatus {
-				record := currentObj.(*v1.Node).ObjectMeta.Name
-				fqdn := record + "." + configFile.GetString("CloudFlareApiInfos.ZoneName")
-				recordContent := getRecordValueIp(fqdn, currentObj, configFile)
+				if currentNodeStatus != oldNodeStatus {
+					record := node.ObjectMeta.Name
+					fqdn := record + "." + configFile.GetString("CloudFlareApiInfos.ZoneName")
+					recordContent := getRecordValueIp(fqdn, node, configFile)
 
-				nodeStatus = "enabled"
-				nodeStatusBool = true
-				if currentObj.(*v1.Node).Spec.Unschedulable {
-					nodeStatus = "disabled"
-					nodeStatusBool = false
+					nodeStatus = "enabled"
+					nodeStatusBool = true
+					if node.Spec.Unschedulable {
+						nodeStatus = "disabled"
+						nodeStatusBool = false
+					}
+
+					log.Infof("Scheduling node %s changed to %s", record, nodeStatus)
+					UpdateDnsRecord(record, recordContent, nodeStatusBool, configFile)
 				}
-
-				log.Info("Scheduling node " + record + " changed to " + nodeStatus)
-				UpdateDnsRecord(record, recordContent, nodeStatusBool, configFile)
 			}
 		},
 	})
@@ -60,21 +64,19 @@ func WatchNodes(clientSet *kubernetes.Clientset, configFile *viper.Viper) {
 	stop := make(chan struct{})
 	go informer.Run(stop)
 
-	for{
-		time.Sleep(time.Second)
-	}
+	<-stop
 }
 
-func getRecordValueIp(fqdn string, obj interface{}, configFile *viper.Viper) string {
+func getRecordValueIp(fqdn string, obj *v1.Node, configFile *viper.Viper) string {
 	if configFile.GetString("GlobalConfig.UpdateDnsType") == "dns" {
 		ipAddress, err := net.LookupHost(fqdn)
 		if err != nil {
-			log.Error("Can't find a DNS record for " + fqdn)
+			log.Errorf("Can't find a DNS record for %s", fqdn)
 			return "nil"
 		}
 		return ipAddress[0]
 	} else {
-		return obj.(*v1.Node).Status.Addresses[0].Address
+		return obj.Status.Addresses[0].Address
 	}
 	return "nil"
 }
