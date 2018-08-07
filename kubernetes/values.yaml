@@ -1,0 +1,19 @@
+KduImageVersion: v0.1
+KduNodeSelector:
+  node-role.kubernetes.io/node: "true"
+
+# Global Config
+KduGlobalUpdateType: node
+KduGlobalMaxDnsEntries: 10
+
+# DNS Info
+KduInfosName: "your_rr_record"
+KduInfosType: A
+KduInfosTtl: 120
+KduInfosProxied: false
+
+# Cloudflare API
+KduCfZoneId: "your_id"
+KduCfZoneName: "your-domain.com"
+KduCfEmail: "your_mail"
+KduCfKey: "your_key"

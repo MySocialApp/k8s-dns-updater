@@ -1,0 +1,46 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: {{ template "kubernetes.name" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app: {{ template "kubernetes.name" . }}
+    chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+spec:
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: {{ template "kubernetes.name" . }}
+    spec:
+      nodeSelector:
+        {{- range $key, $val := .Values.KduNodeSelector }}
+          {{ $key }}: {{ $val | quote }}
+          {{- end}}
+      containers:
+      - name: {{ template "kubernetes.name" . }}
+        image: quay.io/mysocialapp/k8s-dns-updater:{{ .Values.KduImageVersion }}
+        env:
+          - name: KDU_UpdateType
+            value: "{{ .Values.KduGlobalUpdateType }}"
+          - name: KDU_MaxDnsEntries
+            value: "{{ .Values.KduGlobalMaxDnsEntries }}"
+          - name: KDU_Name
+            value: "{{ .Values.KduInfosName }}"
+          - name: KDU_Type
+            value: "{{ .Values.KduInfosType }}"
+          - name: KDU_Ttl
+            value: "{{ .Values.KduInfosTtl }}"
+          - name: KDU_Proxied
+            value: "{{ .Values.KduInfosProxied }}"
+          - name: KDU_Zoneid
+            value: "{{ .Values.KduCfZoneId }}"
+          - name: KDU_Zonename
+            value: "{{ .Values.KduCfZoneName }}"
+          - name: KDU_Email
+            value: "{{ .Values.KduCfEmail }}"
+          - name: KDU_Key
+            value: "{{ .Values.KduCfKey }}"
