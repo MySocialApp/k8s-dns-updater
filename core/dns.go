@@ -52,7 +52,7 @@ func UpdateDnsRecord(record string, recordContent string, status bool, configFil
 		if result == false {
 			log.Error("Wasn't able to create record: %s", dnsRecord)
 		} else {
-			log.Info("Record DNS created: %s", dnsRecord)
+			log.Infof("Record DNS created: %s", dnsRecord)
 		}
 	}
 }
