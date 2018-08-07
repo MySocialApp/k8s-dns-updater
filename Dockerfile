@@ -1,14 +1,19 @@
 FROM alpine:3.8
 
-ARG version=0.1
+ARG version=0.1.1
 
+ADD run.sh /
+ADD https://github.com/Yelp/dumb-init/releases/download/v1.2.2/dumb-init_1.2.2_amd64 /sbin/dumb-init
 ADD https://github.com/MySocialApp/k8s-dns-updater/releases/download/v${version}/k8s-dns-updater_${version}_linux_amd64.tar.gz /tmp/k8s-dns-updater.tar.gz
-WORKDIR /tmp
-CMD mkdir /etc/k8s-dns-updater && \
+
+RUN apk add --update --no-cache libc6-compat bash && \
+    cd /tmp && \
+    mkdir /etc/k8s-dns-updater && \
     tar -xvf /tmp/k8s-dns-updater.tar.gz && \
     mv k8s-dns-updater /usr/bin && \
-    rm -Rf /tmp/*
-ADD config.yaml.example /etc/k8s-dns-updater/
-WORKDIR /etc/k8s-dns-updater/
+    chmod 755 /run.sh /sbin/dumb-init && \
+    rm -Rf /tmp/* /var/cache/apk/*
 
-CMD ["/bin/sh", "/usr/bin/k8s-dns-updater"]
+ADD config.yaml.example /etc/k8s-dns-updater/config.yaml
+
+CMD ["/sbin/dumb-init", "/bin/bash", "/run.sh"]
