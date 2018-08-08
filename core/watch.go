@@ -27,7 +27,7 @@ func WatchNodes(clientSet *kubernetes.Clientset, configFile *viper.Viper) {
 		// Show node status at start
 		AddFunc: func(obj interface{}) {
 			if node, ok := obj.(*v1.Node); ok {
-				log.Infof("First check: %s unschedulable status node is %s", node.ObjectMeta.Name, strconv.FormatBool(node.Spec.Unschedulable))
+				log.Infof("Initial check: %s unschedulable status node is %s", node.ObjectMeta.Name, strconv.FormatBool(node.Spec.Unschedulable))
 			}
 		},
 
