@@ -1,4 +1,4 @@
-# k8s-dns-updater [![Build Status](https://travis-ci.org/MySocialApp/k8s-dns-updater.svg?branch=master)](https://travis-ci.org/MySocialApp/k8s-dns-updater)
+# k8s-dns-updater [![Build Status](https://travis-ci.org/MySocialApp/k8s-dns-updater.svg?branch=master)](https://travis-ci.org/MySocialApp/k8s-dns-updater) [![Docker Repository on Quay](https://quay.io/repository/mysocialapp/k8s-dns-updater/status "Docker Repository on Quay")](https://quay.io/repository/mysocialapp/k8s-dns-updater)
 
 Kubernetes DNS updater is a tool to automatically update DNS entries on a round robin configuration when a node goes into maintenance (drain and uncordon).
 

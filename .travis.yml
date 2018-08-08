@@ -1,7 +1,16 @@
+sudo: required
+
 language: go
 
 services:
 - docker
+
+env:
+- PROJECT_ID="mysocialapp" PROJECT_NAME="k8s-dns-updater" APP_VERSION="$TRAVIS_TAG"
+
+script:
+- go build
+- rm -f ${PROJECT_NAME}
 
 deploy:
 - provider: script
@@ -10,3 +19,10 @@ deploy:
   on:
     tags: true
     condition: $TRAVIS_OS_NAME = linux
+
+after_deploy:
+- test $(curl -s https://quay.io/api/v1/repository/${PROJECT_ID}/${PROJECT_NAME}/tag/ | jq ".tags[] | select(.name == \"${APP_VERSION}\") | select(.end_ts == null) | .name" | wc -l) -eq 0 || echo "Container tag ${APP_VERSION} already exist, cancelling push to avoid override"
+- VERSION_LESSV=$(echo ${APP_VERSION} | sed 's/v//') ; sed -ri "s/(ARG version=).*/\1${VERSION_LESSV}/" Dockerfile
+- docker build -t quay.io/${PROJECT_ID}/${PROJECT_NAME}:${APP_VERSION} .
+- docker login -u="$QUAY_USERNAME" -p="$QUAY_PASSWORD" quay.io
+- docker push quay.io/${PROJECT_ID}/${PROJECT_NAME}:${APP_VERSION}
