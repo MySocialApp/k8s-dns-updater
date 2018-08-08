@@ -68,11 +68,12 @@ func getConfigFromYamlFile() *viper.Viper {
 
 	currentPath, _ := filepath.Abs("./")
 	config.AddConfigPath(currentPath)
+	config.AddConfigPath("/etc/k8s-dns-updater")
 	config.SetConfigName("config")
 
 	if err := config.ReadInConfig(); err != nil {
 		log.Debug(err)
-		log.Fatalf("Config file not found: %/config.yaml", currentPath)
+		log.Fatalf("Config file config.yaml not found in %s or /etc/k8s-dns-updater", currentPath)
 	}
 	log.Debug("Using config file: ", config.ConfigFileUsed())
 
