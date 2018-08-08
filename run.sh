@@ -11,5 +11,4 @@ while IFS='=' read -r name value ; do
   fi
 done < <(env)
 
-cd /etc/k8s-dns-updater
 /usr/bin/k8s-dns-updater

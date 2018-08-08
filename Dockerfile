@@ -11,7 +11,7 @@ RUN apk add --update --no-cache libc6-compat bash && \
     mkdir /etc/k8s-dns-updater && \
     tar -xvf /tmp/k8s-dns-updater.tar.gz && \
     mv k8s-dns-updater /usr/bin && \
-    chmod 755 /run.sh /sbin/dumb-init && \
+    chmod 755 /run.sh /sbin/dumb-init /usr/bin/k8s-dns-updater && \
     rm -Rf /tmp/* /var/cache/apk/*
 
 ADD config.yaml.example /etc/k8s-dns-updater/config.yaml
