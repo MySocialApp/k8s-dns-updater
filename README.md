@@ -11,7 +11,7 @@ We've made this application at [MySocialApp](https://mysocialapp.io) in order to
 
 # Usage
 
-Simply copy the example configuration file config.yaml.example to config.yaml and update the configuration with your needs:
+Simply copy the binary and the example configuration file [config.yaml.example](config.yaml.example) to config.yaml. Then update the configuration with your information:
 
 ```yaml
 GlobalConfig:
@@ -37,6 +37,38 @@ CloudFlareApiInfos:
 
 Then launch the binary in the same folder than the configuration file.
 
+# Kubernetes (HELM)
+
+You can deploy it with the provided HELM chart. First update the [values.yaml](kubernetes/values.yaml) file:
+
+```yaml
+KduImageVersion: v0.1
+KduNodeSelector:
+  node-role.kubernetes.io/node: "true"
+
+# Global Config
+KduGlobalUpdateType: node
+KduGlobalMaxDnsEntries: 10
+
+# DNS Info
+KduInfosName: "your_rr_record"
+KduInfosType: A
+KduInfosTtl: 120
+KduInfosProxied: false
+
+# Cloudflare API
+KduCfZoneId: "your_id"
+KduCfZoneName: "your-domain.com"
+KduCfEmail: "your_mail"
+KduCfKey: "your_key"
+```
+
+Then deploy it into your cluster:
+
+```bash
+helm install --values kubernetes/values.yaml kubernetes
+```
+
 # Requirements
 
 * Kubeconfig must be setup to be able to connect to a Kubernetes cluster
@@ -47,3 +79,4 @@ Then launch the binary in the same folder than the configuration file.
 * Add Ingress support and detect ingress readiness before adding back in RR
 * Add Ingress support and detect if an ingress readiness is failing to remove from RR
 * Support a limit of the number of DNS entries in RR
+* Add prometheus metrics
