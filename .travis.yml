@@ -8,6 +8,8 @@ services:
 env:
 - PROJECT_ID="mysocialapp" PROJECT_NAME="k8s-dns-updater" APP_VERSION="$TRAVIS_TAG"
 
+install: true
+
 script:
 - go build
 - rm -f ${PROJECT_NAME}
