@@ -2,3 +2,4 @@
 dist/
 .idea/
 config.yaml
+kubernetes/custom-values.yaml
