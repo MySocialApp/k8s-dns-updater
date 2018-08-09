@@ -9,7 +9,7 @@ import (
 	"k8s.io/client-go/tools/clientcmd"
 	"os"
 	"path/filepath"
-)
+			)
 
 type Configuration struct {
 	GlobalConfig       GlobalConfig
@@ -39,10 +39,30 @@ type CloudFlareApiInfos struct {
 var configuration Configuration
 
 func Init() (*kubernetes.Clientset, *viper.Viper) {
-	return connectToKubernetes(getK8sConfigFromKubeconfig()), getConfigFromYamlFile()
+	return connectToKubernetes(getK8sConfig()), getConfigFromYamlFile()
 }
 
-func getK8sConfigFromKubeconfig() *rest.Config {
+func getK8sConfig() *rest.Config {
+	var config *rest.Config
+	var err error
+
+	// Try Kubeconfig first
+	config, err = getK8sConfigFromKubeconfig()
+	if err == nil {
+		return config
+	}
+
+	// Else in cluster config
+	log.Debug("Can't get kubeconfig information, trying to connect if is inside the cluster")
+	config, err = getK8sConfigInCluster()
+	if err != nil {
+		log.Fatalf("Can't connect to Kubernetes: %s", err.Error())
+	}
+
+	return config
+}
+
+func getK8sConfigFromKubeconfig() (*rest.Config, error) {
 	var kubeconfig string
 
 	// Load kubeconfig file
@@ -54,13 +74,11 @@ func getK8sConfigFromKubeconfig() *rest.Config {
 	}
 	flag.Parse()
 
-	// Use the current context in kubeconfig
-	config, err := clientcmd.BuildConfigFromFlags("", kubeconfig)
-	if err != nil {
-		log.Fatalf("Error while looking at Kubernetes context: %s", err.Error())
-	}
+	return clientcmd.BuildConfigFromFlags("", kubeconfig)
+}
 
-	return config
+func getK8sConfigInCluster() (*rest.Config, error) {
+	return rest.InClusterConfig()
 }
 
 func getConfigFromYamlFile() *viper.Viper {
