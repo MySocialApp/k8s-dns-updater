@@ -42,9 +42,10 @@ Then launch the binary in the same folder than the configuration file.
 You can deploy it with the provided HELM chart. First update the [values.yaml](kubernetes/values.yaml) file:
 
 ```yaml
-KduImageVersion: v0.1
-KduNodeSelector:
-  node-role.kubernetes.io/node: "true"
+KduImageVersion: v0.2
+#KduNodeSelector:
+#  node-role.kubernetes.io/node: "true"
+KduRbacEnabled: true
 
 # Global Config
 KduGlobalUpdateType: node
@@ -69,9 +70,8 @@ Then deploy it into your cluster:
 helm install --values kubernetes/values.yaml kubernetes
 ```
 
-# Requirements
+# Limitations
 
-* Kubeconfig must be setup to be able to connect to a Kubernetes cluster
 * Support only CloudFlare provider
 
 # Todo
