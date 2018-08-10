@@ -76,6 +76,7 @@ helm install --values kubernetes/values.yaml kubernetes
 
 # Todo
 
+* When starting, validate the current status and update accordingly the DNS
 * Add Ingress support and detect ingress readiness before adding back in RR
 * Add Ingress support and detect if an ingress readiness is failing to remove from RR
 * Support a limit of the number of DNS entries in RR
