@@ -1,4 +1,4 @@
-KduImageVersion: v0.1
+KduImageVersion: v0.2
 #KduNodeSelector:
 #  node-role.kubernetes.io/node: "true"
 KduRbacEnabled: true
