@@ -44,6 +44,12 @@ spec:
           - name: KDU_Zonename
             value: "{{ .Values.KduCfZoneName }}"
           - name: KDU_Email
-            value: "{{ .Values.KduCfEmail }}"
+            valueFrom:
+              secretKeyRef:
+                name: {{ template "kubernetes.name" . }}
+                key: KDU_Email
           - name: KDU_Key
-            value: "{{ .Values.KduCfKey }}"
+            valueFrom:
+              secretKeyRef:
+                name: {{ template "kubernetes.name" . }}
+                key: KDU_Key
