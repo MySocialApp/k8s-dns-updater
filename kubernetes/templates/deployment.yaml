@@ -16,6 +16,9 @@ spec:
       labels:
         app: {{ template "kubernetes.name" . }}
     spec:
+      {{ if .Values.KduRbacEnabled }}
+      serviceAccountName: {{ template "kubernetes.name" . }}
+      {{ end }}
       nodeSelector:
         {{- range $key, $val := .Values.KduNodeSelector }}
           {{ $key }}: {{ $val | quote }}

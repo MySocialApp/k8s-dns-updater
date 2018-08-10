@@ -1,6 +1,7 @@
 KduImageVersion: v0.1
-KduNodeSelector:
-  node-role.kubernetes.io/node: "true"
+#KduNodeSelector:
+#  node-role.kubernetes.io/node: "true"
+KduRbacEnabled: true
 
 # Global Config
 KduGlobalUpdateType: node
