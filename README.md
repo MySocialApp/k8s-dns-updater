@@ -1,13 +1,14 @@
 # k8s-dns-updater [![Build Status](https://travis-ci.org/MySocialApp/k8s-dns-updater.svg?branch=master)](https://travis-ci.org/MySocialApp/k8s-dns-updater) [![Docker Repository on Quay](https://quay.io/repository/mysocialapp/k8s-dns-updater/status "Docker Repository on Quay")](https://quay.io/repository/mysocialapp/k8s-dns-updater)
 
-Kubernetes DNS updater is a tool to automatically update DNS entries on a round robin (RR) configuration when a node goes into maintenance.
+Kubernetes DNS updater is a tool watching Kubernetes nodes status changes and update the Round Robin DNS accordingly. This is useful when running an on premise cluster
+with a simple DNS load balancing. This to avoid manual intervention when a node fails down or is going into maintenance. 
 
 ![test](img/kdu_main.png)
 
 We've made this application at [MySocialApp](https://mysocialapp.io) in order to have automatic changes to:
 
-* Add a node in the round robin DNS when a node is uncordon
-* Remove a node from the round robin DNS when a node is drain
+* Add a node in the round robin DNS when a node is uncordoned
+* Remove a node from the round robin DNS when a node is drained
 
 # Usage
 
@@ -76,8 +77,8 @@ helm install --values kubernetes/values.yaml kubernetes
 
 # Todo
 
-* When starting, validate the current status and update accordingly the DNS
+* Support a limited number of DNS entries in RR (in progress)
+* When booting, validate the current status and update accordingly the DNS (in progress)
 * Add Ingress support and detect ingress readiness before adding back in RR
 * Add Ingress support and detect if an ingress readiness is failing to remove from RR
-* Support a limit of the number of DNS entries in RR
 * Add prometheus metrics
