@@ -1,6 +1,6 @@
 FROM alpine:3.8
 
-ARG version=0.2
+ARG version=0.3
 
 ADD run.sh /
 ADD https://github.com/Yelp/dumb-init/releases/download/v1.2.2/dumb-init_1.2.2_amd64 /sbin/dumb-init

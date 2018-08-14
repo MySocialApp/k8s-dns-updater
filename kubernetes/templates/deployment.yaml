@@ -29,8 +29,8 @@ spec:
         env:
           - name: KDU_UpdateType
             value: "{{ .Values.KduGlobalUpdateType }}"
-          - name: KDU_MaxDnsEntries
-            value: "{{ .Values.KduGlobalMaxDnsEntries }}"
+          - name: KDU_WantedRrDnsEntries
+            value: "{{ .Values.KduGlobalWantedRrDnsEntries }}"
           - name: KDU_Name
             value: "{{ .Values.KduInfosName }}"
           - name: KDU_Type

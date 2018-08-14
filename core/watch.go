@@ -1,19 +1,19 @@
 package core
 
 import (
+	"github.com/cloudflare/cloudflare-go"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 	"k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/fields"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/cache"
-	"net"
 	"strconv"
 	"time"
 )
 
 // WatchNodes is watching kubernetes nodes changes and update DNS accordingly
-func WatchNodes(clientSet *kubernetes.Clientset, configFile *viper.Viper) {
+func WatchNodes(clientSet *kubernetes.Clientset, cloudFlareAPI *cloudflare.API, configFile *viper.Viper) {
 	var nodeStatus string
 	var nodeStatusBool bool
 	watchlist := cache.NewListWatchFromClient(clientSet.CoreV1().RESTClient(), "nodes", v1.NamespaceAll, fields.Everything())
@@ -28,13 +28,15 @@ func WatchNodes(clientSet *kubernetes.Clientset, configFile *viper.Viper) {
 		// Show node status at start
 		AddFunc: func(obj interface{}) {
 			if node, ok := obj.(*v1.Node); ok {
-				log.Infof("Initial check: %s unschedulable status node is %s", node.ObjectMeta.Name, strconv.FormatBool(node.Spec.Unschedulable))
+				log.Infof("Initial k8s node check: %s unschedulable status node is %s", node.ObjectMeta.Name, strconv.FormatBool(node.Spec.Unschedulable))
 			}
 		},
 
 		// Show deleted node
 		DeleteFunc: func(obj interface{}) {
-			log.Infof("Deleted node: %s", obj.(*v1.Node).ObjectMeta.Name)
+			if node, ok := obj.(*v1.Node); ok {
+				log.Infof("Deleted node: %s", node.ObjectMeta.Name)
+			}
 		},
 
 		// Detect changes
@@ -46,7 +48,7 @@ func WatchNodes(clientSet *kubernetes.Clientset, configFile *viper.Viper) {
 				if currentNodeStatus != oldNodeStatus {
 					record := node.ObjectMeta.Name
 					fqdn := record + "." + configFile.GetString("CloudFlareApiInfos.ZoneName")
-					recordContent := getDNSRecordValueIP(fqdn, node, configFile)
+					recordContent := GetDNSRecordValueIP(fqdn, node, configFile)
 
 					nodeStatus = "enabled"
 					nodeStatusBool = true
@@ -56,7 +58,8 @@ func WatchNodes(clientSet *kubernetes.Clientset, configFile *viper.Viper) {
 					}
 
 					log.Infof("Scheduling node %s changed to %s", record, nodeStatus)
-					UpdateDNSRecord(record, recordContent, nodeStatusBool, configFile)
+					UpdateDNSRecord(cloudFlareAPI, record, recordContent, nodeStatusBool, configFile)
+					// Todo: ReassignDnsRrEntries(cloudFlareApi) ?
 				}
 			}
 		},
@@ -66,16 +69,4 @@ func WatchNodes(clientSet *kubernetes.Clientset, configFile *viper.Viper) {
 	go informer.Run(stop)
 
 	<-stop
-}
-
-func getDNSRecordValueIP(fqdn string, obj *v1.Node, configFile *viper.Viper) string {
-	if configFile.GetString("GlobalConfig.UpdateDnsType") == "dns" {
-		ipAddress, err := net.LookupHost(fqdn)
-		if err != nil {
-			log.Errorf("Can't find a DNS record for %s", fqdn)
-			return "nil"
-		}
-		return ipAddress[0]
-	}
-	return obj.Status.Addresses[0].Address
 }

@@ -1,11 +1,11 @@
-KduImageVersion: v0.2
+KduImageVersion: v0.3
 #KduNodeSelector:
 #  node-role.kubernetes.io/node: "true"
 KduRbacEnabled: true
 
 # Global Config
 KduGlobalUpdateType: node
-KduGlobalMaxDnsEntries: 10
+WantedRrDnsEntries: 10
 
 # DNS Info
 KduInfosName: "your_rr_record"

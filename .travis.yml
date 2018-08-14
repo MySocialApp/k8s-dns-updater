@@ -6,12 +6,16 @@ services:
 - docker
 
 env:
-- PROJECT_ID="mysocialapp" PROJECT_NAME="k8s-dns-updater" APP_VERSION="$TRAVIS_TAG"
+- PROJECT_ID="mysocialapp" PROJECT_NAME="k8s-dns-updater" APP_VERSION="$TRAVIS_TAG" K8S_VERSION=1.8 NUM_NODES=6 SKIP_SNAPSHOT=y PATH="$HOME/.kubeadm-dind-cluster:/tmp/linux-amd64:$PATH"
 
-install: true
+install:
+- tests/k8s-euft/bootstrap_k8s.sh
 
 script:
 - make build
+
+after_success:
+- bats -t tests/boot/create.bats
 - make clean
 
 deploy:

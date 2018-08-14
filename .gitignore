@@ -1,6 +1,8 @@
 .vscode/
 dist/
 .idea/
+tests/.vagrant
 config.yaml
 kubernetes/custom-values.yaml
 k8s-dns-updater
+dind-cluster*

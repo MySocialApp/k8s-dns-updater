@@ -232,6 +232,14 @@
   version = "v1.0.6"
 
 [[projects]]
+  branch = "master"
+  digest = "1:ae5581ad198bcdab376525bc29a2f9fe245d1ad477d21ab787c94d47a8790815"
+  name = "github.com/smallfish/simpleyaml"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "a32031077861b1fbdf988d2c0865e98ec832dd4c"
+
+[[projects]]
   digest = "1:bd1ae00087d17c5a748660b8e89e1043e1e5479d0fea743352cda2f8dd8c4f84"
   name = "github.com/spf13/afero"
   packages = [
@@ -518,9 +526,11 @@
   input-imports = [
     "github.com/cloudflare/cloudflare-go",
     "github.com/sirupsen/logrus",
+    "github.com/smallfish/simpleyaml",
     "github.com/spf13/cobra",
     "github.com/spf13/viper",
     "k8s.io/api/core/v1",
+    "k8s.io/apimachinery/pkg/apis/meta/v1",
     "k8s.io/apimachinery/pkg/fields",
     "k8s.io/client-go/kubernetes",
     "k8s.io/client-go/rest",

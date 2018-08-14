@@ -17,19 +17,19 @@ Simply copy the binary and the example configuration file [config.yaml.example](
 ```yaml
 GlobalConfig:
   # Use node name (node) or dns name (dns) IP to update DNS
-  UpdateDnsType: node
-  # Maximum entries in the Round Robin DNS
-  MaxDnsEntries: 10
+  UpdateDNSType: node
+  # Wanted entries in the Round Robin DNS
+  WantedRrDNSEntries: 3
 
 # DNS info
-DnsInfos:
+DNSInfos:
   Name: "my-round-robin.domain.com"
   Type: A
-  Ttl: 120
+  TTL: 120
   Proxied: false
 
 # Credentials
-CloudFlareApiInfos:
+CloudFlareAPIInfos:
   Zoneid: ""
   Zonename: ""
   Email: ""
@@ -43,7 +43,7 @@ Then launch the binary in the same folder than the configuration file.
 You can deploy it with the provided HELM chart. First update the [values.yaml](kubernetes/values.yaml) file:
 
 ```yaml
-KduImageVersion: v0.2
+KduImageVersion: v0.3
 #KduNodeSelector:
 #  node-role.kubernetes.io/node: "true"
 KduRbacEnabled: true
