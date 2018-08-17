@@ -10,6 +10,7 @@ default: build
 all: build ; $(info $(M) running all builds...)
 
 lint: ; $(info $(M) running golint...)
+	go get -u golang.org/x/lint/golint
 	scripts/validate-golint.sh $(SRCS)
 
 prepare: ; $(info $(M) preparing for build...) @ ## Update all versions
