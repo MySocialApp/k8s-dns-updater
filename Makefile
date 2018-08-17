@@ -1,5 +1,5 @@
-.PHONY: all
-PACKAGE  = k8s-dns-updater
+.PHONY: all prepare lint
+PACKAGE  = $(shell basename "${PWD}")
 M = $(shell printf "\033[34;1m▶\033[0m")
 SRCS = $(shell git ls-files '*.go' '*/*.go' | grep -v '^vendor/')
 
