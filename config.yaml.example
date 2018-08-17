@@ -1,18 +1,18 @@
 GlobalConfig:
   # Use node name (node) or dns name (dns) IP to update DNS
-  UpdateDnsType: node
+  UpdateDNSType: node
   # Wanted entries in the Round Robin DNS
-  WantedRrDnsEntries: 3
+  WantedRrDNSEntries: 3
 
 # DNS info
-DnsInfos:
+DNSInfos:
   Name: ""
   Type: A
-  Ttl: 120
+  TTL: 120
   Proxied: false
 
 # Credentials
-CloudFlareApiInfos:
+CloudFlareAPIInfos:
   Zoneid: ""
   Zonename: ""
   Email: ""

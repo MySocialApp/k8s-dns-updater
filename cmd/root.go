@@ -10,6 +10,7 @@ import (
 )
 
 var cfgFile string
+// Verbose represent log level application
 var Verbose string
 
 // rootCmd represents the base command when called without any subcommands

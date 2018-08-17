@@ -8,16 +8,17 @@ import (
 	"github.com/spf13/viper"
 )
 
-func UpdateDnsRecord(record string, recordContent string, status bool, configFile *viper.Viper) {
+// UpdateDNSRecord add or remove DNS entry from the given DNS record
+func UpdateDNSRecord(record string, recordContent string, status bool, configFile *viper.Viper) {
 	recordInfo := cloudflare.DNSRecord{
 		ID:       "",
-		Name:     configFile.GetString("DnsInfos.Name"),
-		Type:     configFile.GetString("DnsInfos.Type"),
+		Name:     configFile.GetString("DNSInfos.Name"),
+		Type:     configFile.GetString("DNSInfos.Type"),
 		Content:  recordContent,
-		TTL:      configFile.GetInt("DnsInfos.Ttl"),
-		Proxied:  configFile.GetBool("DnsInfos.Proxied"),
-		ZoneID:   configFile.GetString("CloudFlareApiInfos.ZoneId"),
-		ZoneName: configFile.GetString("CloudFlareApiInfos.ZoneName"),
+		TTL:      configFile.GetInt("DNSInfos.TTL"),
+		Proxied:  configFile.GetBool("DNSInfos.Proxied"),
+		ZoneID:   configFile.GetString("CloudFlareAPIInfos.ZoneID"),
+		ZoneName: configFile.GetString("CloudFlareAPIInfos.ZoneName"),
 	}
 	fqdn := record + "." + recordInfo.ZoneName
 
@@ -28,10 +29,10 @@ func UpdateDnsRecord(record string, recordContent string, status bool, configFil
 
 	// Connect to Cloudflare
 	log.Debugf("requesting %s dns record to %s", record, strconv.FormatBool(status))
-	cloudFlareApi := cloudFlareConnect(configFile.GetString("CloudFlareApiInfos.Key"), configFile.GetString("CloudFlareApiInfos.Email"))
+	cloudFlareAPI := cloudFlareConnect(configFile.GetString("CloudFlareAPIInfos.Key"), configFile.GetString("CloudFlareAPIInfos.Email"))
 
 	// Skip if record is already in the desired state
-	recordResult, recordExist := checkDnsRecordExist(cloudFlareApi, &recordInfo)
+	recordResult, recordExist := checkDNSRecordExist(cloudFlareAPI, &recordInfo)
 	if recordExist == status {
 		log.Infof("Change detected, but no need to update current DNS record. Skipping for %s", fqdn)
 		return
@@ -41,14 +42,14 @@ func UpdateDnsRecord(record string, recordContent string, status bool, configFil
 	dnsRecord := fmt.Sprintf("%s -> %s (%s)", recordInfo.Name, recordInfo.Content, fqdn)
 	if recordExist == true {
 		recordInfo.ID = recordResult[0].ID
-		result := deleteCurrentRecord(cloudFlareApi, &recordInfo)
+		result := deleteCurrentRecord(cloudFlareAPI, &recordInfo)
 		if result == false {
 			log.Errorf("Wasn't able to delete record: %s", dnsRecord)
 		} else {
 			log.Infof("Record DNS deleted: %s", dnsRecord)
 		}
 	} else {
-		result := createCurrentRecord(cloudFlareApi, &recordInfo)
+		result := createCurrentRecord(cloudFlareAPI, &recordInfo)
 		if result == false {
 			log.Error("Wasn't able to create record: %s", dnsRecord)
 		} else {
@@ -83,7 +84,7 @@ func createCurrentRecord(api *cloudflare.API, record *cloudflare.DNSRecord) bool
 	return true
 }
 
-func checkDnsRecordExist(api *cloudflare.API, record *cloudflare.DNSRecord) ([]cloudflare.DNSRecord, bool) {
+func checkDNSRecordExist(api *cloudflare.API, record *cloudflare.DNSRecord) ([]cloudflare.DNSRecord, bool) {
 	recordResult, err := api.DNSRecords(record.ZoneID, *record)
 	if err != nil || len(recordResult) == 0 {
 		log.Debugf("checking record %s in DNS zone(%s): does not exist", record.Name, strconv.Itoa(len(recordResult)))

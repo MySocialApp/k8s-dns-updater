@@ -10,26 +10,30 @@ import (
 	"path/filepath"
 )
 
+// Configuration represent the complete configuration
 type Configuration struct {
 	GlobalConfig       GlobalConfig
-	DnsInfos           DnsInfos
-	CloudFlareApiInfos CloudFlareApiInfos
+	DNSInfos           DNSInfos
+	CloudFlareAPIInfos CloudFlareAPIInfos
 }
 
+// GlobalConfig is application related
 type GlobalConfig struct {
-	UpdateDnsType string
-	MaxDnsEntries int
+	UpdateDNSType      string
+	WantedRrDNSEntries int
 }
 
-type DnsInfos struct {
+// DNSInfos for what you expect on your DNS record
+type DNSInfos struct {
 	Name    string
 	Type    string
-	Ttl     int
+	TTL     int
 	Proxied bool
 }
 
-type CloudFlareApiInfos struct {
-	ZoneId   string
+// CloudFlareAPIInfos are CloudFlare connection API info
+type CloudFlareAPIInfos struct {
+	ZoneID   string
 	ZoneName string
 	Email    string
 	Key      string
@@ -37,6 +41,7 @@ type CloudFlareApiInfos struct {
 
 var configuration Configuration
 
+// Init returns Kubernetes connection and yaml config
 func Init() (*kubernetes.Clientset, *viper.Viper) {
 	return connectToKubernetes(getK8sConfig()), getConfigFromYamlFile()
 }

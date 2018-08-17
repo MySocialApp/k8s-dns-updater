@@ -12,6 +12,7 @@ import (
 	"time"
 )
 
+// WatchNodes is watching kubernetes nodes changes and update DNS accordingly
 func WatchNodes(clientSet *kubernetes.Clientset, configFile *viper.Viper) {
 	var nodeStatus string
 	var nodeStatusBool bool
@@ -45,7 +46,7 @@ func WatchNodes(clientSet *kubernetes.Clientset, configFile *viper.Viper) {
 				if currentNodeStatus != oldNodeStatus {
 					record := node.ObjectMeta.Name
 					fqdn := record + "." + configFile.GetString("CloudFlareApiInfos.ZoneName")
-					recordContent := getDnsRecordValueIp(fqdn, node, configFile)
+					recordContent := getDNSRecordValueIP(fqdn, node, configFile)
 
 					nodeStatus = "enabled"
 					nodeStatusBool = true
@@ -55,7 +56,7 @@ func WatchNodes(clientSet *kubernetes.Clientset, configFile *viper.Viper) {
 					}
 
 					log.Infof("Scheduling node %s changed to %s", record, nodeStatus)
-					UpdateDnsRecord(record, recordContent, nodeStatusBool, configFile)
+					UpdateDNSRecord(record, recordContent, nodeStatusBool, configFile)
 				}
 			}
 		},
@@ -67,7 +68,7 @@ func WatchNodes(clientSet *kubernetes.Clientset, configFile *viper.Viper) {
 	<-stop
 }
 
-func getDnsRecordValueIp(fqdn string, obj *v1.Node, configFile *viper.Viper) string {
+func getDNSRecordValueIP(fqdn string, obj *v1.Node, configFile *viper.Viper) string {
 	if configFile.GetString("GlobalConfig.UpdateDnsType") == "dns" {
 		ipAddress, err := net.LookupHost(fqdn)
 		if err != nil {
@@ -75,8 +76,6 @@ func getDnsRecordValueIp(fqdn string, obj *v1.Node, configFile *viper.Viper) str
 			return "nil"
 		}
 		return ipAddress[0]
-	} else {
-		return obj.Status.Addresses[0].Address
 	}
-	return "nil"
+	return obj.Status.Addresses[0].Address
 }
