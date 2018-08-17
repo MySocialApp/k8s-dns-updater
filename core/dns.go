@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"github.com/cloudflare/cloudflare-go"
 	log "github.com/sirupsen/logrus"
-	"github.com/spf13/viper"
 	"strconv"
+	"github.com/spf13/viper"
 )
 
 func UpdateDnsRecord(record string, recordContent string, status bool, configFile *viper.Viper) {
@@ -27,7 +27,7 @@ func UpdateDnsRecord(record string, recordContent string, status bool, configFil
 	}
 
 	// Connect to Cloudflare
-	log.Debugf("Requesting %s dns record to %s", record, strconv.FormatBool(status))
+	log.Debugf("requesting %s dns record to %s", record, strconv.FormatBool(status))
 	cloudFlareApi := cloudFlareConnect(configFile.GetString("CloudFlareApiInfos.Key"), configFile.GetString("CloudFlareApiInfos.Email"))
 
 	// Skip if record is already in the desired state
@@ -86,9 +86,9 @@ func createCurrentRecord(api *cloudflare.API, record *cloudflare.DNSRecord) bool
 func checkDnsRecordExist(api *cloudflare.API, record *cloudflare.DNSRecord) ([]cloudflare.DNSRecord, bool) {
 	recordResult, err := api.DNSRecords(record.ZoneID, *record)
 	if err != nil || len(recordResult) == 0 {
-		log.Debugf("Checking record %s in DNS zone(%s): does not exist", record.Name, strconv.Itoa(len(recordResult)))
+		log.Debugf("checking record %s in DNS zone(%s): does not exist", record.Name, strconv.Itoa(len(recordResult)))
 		return recordResult, false
 	}
-	log.Debugf("Checking record %s: exists", record.Name)
+	log.Debugf("checking record %s: exists", record.Name)
 	return recordResult, true
 }

@@ -45,7 +45,7 @@ func WatchNodes(clientSet *kubernetes.Clientset, configFile *viper.Viper) {
 				if currentNodeStatus != oldNodeStatus {
 					record := node.ObjectMeta.Name
 					fqdn := record + "." + configFile.GetString("CloudFlareApiInfos.ZoneName")
-					recordContent := getRecordValueIp(fqdn, node, configFile)
+					recordContent := getDnsRecordValueIp(fqdn, node, configFile)
 
 					nodeStatus = "enabled"
 					nodeStatusBool = true
@@ -67,7 +67,7 @@ func WatchNodes(clientSet *kubernetes.Clientset, configFile *viper.Viper) {
 	<-stop
 }
 
-func getRecordValueIp(fqdn string, obj *v1.Node, configFile *viper.Viper) string {
+func getDnsRecordValueIp(fqdn string, obj *v1.Node, configFile *viper.Viper) string {
 	if configFile.GetString("GlobalConfig.UpdateDnsType") == "dns" {
 		ipAddress, err := net.LookupHost(fqdn)
 		if err != nil {

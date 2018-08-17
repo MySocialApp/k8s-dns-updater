@@ -1,7 +1,6 @@
 package core
 
 import (
-	"flag"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 	"k8s.io/client-go/kubernetes"
@@ -9,7 +8,7 @@ import (
 	"k8s.io/client-go/tools/clientcmd"
 	"os"
 	"path/filepath"
-			)
+)
 
 type Configuration struct {
 	GlobalConfig       GlobalConfig
@@ -53,7 +52,7 @@ func getK8sConfig() *rest.Config {
 	}
 
 	// Else in cluster config
-	log.Debug("Can't get kubeconfig information, trying to connect if is inside the cluster")
+	log.Debug("can't get kubeconfig information, trying to connect if is inside the cluster")
 	config, err = getK8sConfigInCluster()
 	if err != nil {
 		log.Fatalf("Can't connect to Kubernetes: %s", err.Error())
@@ -63,16 +62,12 @@ func getK8sConfig() *rest.Config {
 }
 
 func getK8sConfigFromKubeconfig() (*rest.Config, error) {
-	var kubeconfig string
-
 	// Load kubeconfig file
-	log.Debug("Getting Kubernetes config from kubeconfig")
+	log.Debug("getting Kubernetes config from kubeconfig")
+	kubeconfig := ""
 	if home := homeDir(); home != "" {
-		flag.StringVar(&kubeconfig, "kubeconfig", filepath.Join(home, ".kube", "config"), "(optional) absolute path to the kubeconfig file")
-	} else {
-		flag.StringVar(&kubeconfig, "kubeconfig", "", "absolute path to the kubeconfig file")
+		kubeconfig = filepath.Join(home, ".kube", "config")
 	}
-	flag.Parse()
 
 	return clientcmd.BuildConfigFromFlags("", kubeconfig)
 }
@@ -91,9 +86,9 @@ func getConfigFromYamlFile() *viper.Viper {
 
 	if err := config.ReadInConfig(); err != nil {
 		log.Debug(err)
-		log.Fatalf("Config file config.yaml not found in %s or /etc/k8s-dns-updater", currentPath)
+		log.Fatalf("config file config.yaml not found in %s or /etc/k8s-dns-updater", currentPath)
 	}
-	log.Debug("Using config file: ", config.ConfigFileUsed())
+	log.Debug("using config file: ", config.ConfigFileUsed())
 
 	return config
 }

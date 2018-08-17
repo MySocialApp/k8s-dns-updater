@@ -1,9 +1,9 @@
 package main
 
 import (
-	"github.com/MySocialApp/k8s-dns-updater/core"
+	"github.com/MySocialApp/k8s-dns-updater/cmd"
 )
 
 func main() {
-	core.Main()
+	cmd.Execute()
 }
