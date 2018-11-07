@@ -17,7 +17,7 @@ prepare: ; $(info $(M) preparing for build...) @ ## Update all versions
 	scripts/update_version.sh
 
 build: prepare lint ; $(info $(M) building binary...)
-	go build
+	scripts/go_build.sh
 
 image: ; $(info $(M) building container image...)
 	docker build --no-cache -t $(PACKAGE):$(shell ./k8s-dns-updater version) .

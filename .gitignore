@@ -6,3 +6,4 @@ config.yaml
 kubernetes/custom-values.yaml
 k8s-dns-updater
 dind-cluster*
+nohup.out

@@ -15,7 +15,7 @@ script:
 - make build
 
 after_success:
-- bats -t tests/boot/create.bats
+- bats -t tests/boot/start.bats
 - make clean
 
 deploy:

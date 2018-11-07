@@ -7,10 +7,14 @@ load common
     label_nodes
 }
 
-@test "Ensure nodes has correct labels" {
-    num_nodes_are_labeled_as_node
+@test "Create DNS nodes records" {
+    #create_dns_hosts_records
 }
 
-@test "Ensure k8s-dns-updater to populate DNS" {
+@test "Ensure there is no other running k8s-dns-updater" {
+    kill_app
+}
 
+@test "Start k8s-dns-updater" {
+    run_app
 }
