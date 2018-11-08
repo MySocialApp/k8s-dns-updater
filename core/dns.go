@@ -53,7 +53,7 @@ func UpdateDNSRecord(api *cloudflare.API, record string, recordContent string, s
 
 	// Ensure content field is ok
 	if recordInfo.Content == "nil" {
-		log.Errorf("DNS content was not defined, skipping for host: %s", fqdn)
+		log.Warnf("DNS content was not defined, skipping for host: %s", fqdn)
 		return false
 	}
 
@@ -90,7 +90,7 @@ func GetDNSRecords(api *cloudflare.API, record *cloudflare.DNSRecord) ([]cloudfl
 	// checking if record exists
 	recordResult, err := api.DNSRecords(record.ZoneID, *record)
 	if err != nil {
-		log.Errorf("Error while trying to get %s record info: %v", record.Name, err)
+		log.Warnf("Error while trying to get %s record info: %v", record.Name, err)
 		return recordResult, false
 	}
 

@@ -3,6 +3,8 @@ GlobalConfig:
   UpdateDNSType: node
   # Wanted entries in the Round Robin DNS
   WantedRrDNSEntries: 3
+  HealthListenAddress: localhost
+  HealthListenPort: 8080
 
 # DNS info
 DNSInfos:
@@ -13,7 +15,7 @@ DNSInfos:
 
 # Credentials
 CloudFlareAPIInfos:
-  Zoneid: ""
-  Zonename: ""
+  ZoneId: ""
+  ZoneName: ""
   Email: ""
   Key: ""

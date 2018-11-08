@@ -1,11 +1,13 @@
 package core
 
 import (
+	"encoding/json"
 	"github.com/cloudflare/cloudflare-go"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 	"k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
+	"net/http"
 )
 
 // Main is the core function
@@ -16,6 +18,10 @@ func Main() {
 	// Connect to Cloudflare
 	cloudFlareAPI, dnsRecord := InitCloudflare(yamlConfig)
 
+	// Health page
+	http.HandleFunc("/health", statusHandler("ok", yamlConfig))
+	go http.ListenAndServe(yamlConfig.GetString("GlobalConfig.HealthListenAddress") + ":" + yamlConfig.GetString("GlobalConfig.HealthListenPort"), nil)
+
 	// Reassign at start to ensure everything is as expected
 	dnsList := GetCurrentDNSRecordsList(cloudFlareAPI, dnsRecord, yamlConfig)
 	ReassignDNSRrEntries(cloudFlareAPI, k8sConnect, yamlConfig, dnsRecord, dnsList)
@@ -23,6 +29,18 @@ func Main() {
 	// Continuously Watch node changes
 	WatchNodes(k8sConnect, cloudFlareAPI, yamlConfig)
 	// Todo: regularely check if wanted number of dns == cloudflare list ?
+}
+
+func statusHandler(healthService string, configFile *viper.Viper) func(http.ResponseWriter, *http.Request) {
+	log.Infof("Health available on http://%s:%s/health", configFile.GetString("GlobalConfig.HealthListenAddress"), configFile.GetString("GlobalConfig.HealthListenPort"))
+	return func(w http.ResponseWriter, r *http.Request) {
+		bytes, err := json.MarshalIndent(healthService, "", "\t")
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		w.Write(bytes)
+	}
 }
 
 // ReassignDNSRrEntries will ensure the number of wanted entries in the round robin is respected
