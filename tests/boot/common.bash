@@ -113,7 +113,9 @@ clear_cloudflare_entries() {
 
 run_app() {
     nohup ./k8s-dns-updater 3>- &
-    sleep 5
+}
+
+status_app() {
     if [ $(ps aux | grep -v grep | grep -c k8s-dns-updater) != 1 ] ; then
         echo "Process k8s-dns-updater does not exist"
         exit 1

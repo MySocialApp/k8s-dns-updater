@@ -17,4 +17,5 @@ load common
 
 @test "Start k8s-dns-updater" {
     run_app
+    status_app
 }
