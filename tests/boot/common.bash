@@ -112,7 +112,7 @@ clear_cloudflare_entries() {
 }
 
 run_app() {
-    nohup ./k8s-dns-updater 3>- &
+    nohup ./k8s-dns-updater >&3
 }
 
 status_app() {
