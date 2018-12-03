@@ -26,6 +26,8 @@ spec:
       containers:
       - name: {{ template "kubernetes.name" . }}
         image: quay.io/mysocialapp/k8s-dns-updater:{{ .Values.KduImageVersion }}
+        resources:
+{{ toYaml .Values.KduResources | indent 10 }}
         env:
           - name: KDU_UpdateType
             value: "{{ .Values.KduGlobalUpdateType }}"
